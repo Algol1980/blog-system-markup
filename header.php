@@ -32,7 +32,7 @@
                     }
                 } else {
                 ?>
-            <a class="navbar-brand" href="index.php">Blog System</a>
+            <a class="navbar-brand" href="/">Blog System</a>
                 <?php } ?>
 
         </div>

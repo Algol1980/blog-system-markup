@@ -16,14 +16,19 @@ class PostModel {
     private $createdAt;
     private $userId;
 
-    const PER_PAGE = 2;
 
     public function __construct($id = null, $title = null, $body = null, $image = null, $createdAt = null, $userId = null) {
         $this->id = $id;
         $this->title = $title;
         $this->body = $body;
         $this->image = $image;
-        $this->createdAt = $createdAt;
+//        $this->createdAt = $createdAt;
+        if(is_string($createdAt)) {
+            $createdAt = new DateTime($createdAt);
+        }
+        if($createdAt instanceof DateTime) {
+            $this->createdAt = $createdAt;
+        }
         $this->userId = $userId;
     }
 
@@ -31,15 +36,14 @@ class PostModel {
         $this->userId = $value;
     }
 
+
     public function save() {
-        $path = tempnam('NOT_EXIST', 'tempDb_');
-
-        $userDb = fopen($path, "a+");
-
-        if(!$userDb) {
-            return false;
+        if($this->id) {
+            $sql = 'UPDATE post SET title = :title, body = :body, image = :image, createdAt = :createdAt, user_id = :user_id,';
+        } else {
+            $sql = 'INSERT INTO post (title, body, image, createdAt, user_id) VALUES (:title, :body, :image, :createdAt, :user_id)';
+            $this->createdAt = new DateTime();
         }
-
         $name = false;
 
         if(
@@ -54,47 +58,39 @@ class PostModel {
                     time() . "." .
                     $pathInfo['extension'];
 
-                //TODO: implement imagick
-                $img = new Imagick($this->image['tmp_name']);
-                $img->thumbnailImage(100, 0);
-                $img->writeImage("img/thumb_" . $name);
+//                $img = new Imagick($this->image['tmp_name']);
+//                $img->thumbnailImage(100, 0);
+//                $img->writeImage("img/thumb_" . $name);
 
                 move_uploaded_file(
                     $this->image['tmp_name'], "img/" . $name
                 );
-
-
-
+                $this->image = $name;
             }
         }
+        else {
+            $this->image = NULL;
+        }
 
-        fwrite($userDb, json_encode([
-                'title' => $this->title,
-                'body' => $this->body,
-                'image' => $name,
-                'createdAt' => date("d.m.Y H:i:s"),
-            ]) . PHP_EOL);
-
-        $oldDb = "db/".$this->userId.".db";
-
-        if(file_exists($oldDb)) {
-            $oldUserDb = fopen($oldDb, "r");
-
-            while (!feof($oldUserDb)) {
-                $line = fgets($oldUserDb);
-                fwrite($userDb, $line);
+        $statement = MySQLConnector::getInstance()->getPDO()->prepare($sql);
+        $vars = [
+            ':title' => $this->title,
+            ':body' => $this->body,
+            ':image' => $this->image,
+            ':createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
+            ':user_id' => $this->userId
+        ];
+        if($statement->execute($vars)) {
+            if (!$this->id) {
+                $this->id = intval(MySQLConnector::getInstance()->getPDO()->lastInsertId());
             }
 
-            fclose($oldUserDb);
+            return true;
+        } else {
+            var_dump($statement->errorInfo());
         }
-        fclose($userDb);
 
-        rename($path, "db/".$this->userId.".db");
-
-
-
-
-        return true;
+        return false;
     }
 
     public function __get($name) {
@@ -110,56 +106,31 @@ class PostModel {
      * @param int $page
      * @return PostModel[]
      */
-    public static function findPostsByUser($userId, $page = 1) {
+    public static function findPostsByUser($userId, $page = 1)
+    {
 
-        //$sql = "SELECT * FROM post WHERE userId = :userId OFFSET :offset LIMIT :limit";
-        $shift = ($page - 1) * self::PER_PAGE;
-        $sql = "SELECT * FROM post WHERE userId = :userId LIMIT :limit OFFSET :offset";
+        $shift = ($page - 1) * PER_PAGE;
+        $sql = 'SELECT * FROM post WHERE user_id = :userId LIMIT :limit OFFSET :offset';
         $statement = MySQLConnector::getInstance()->getPDO()->prepare($sql);
-        if($statement->execute([
-            ':userId' => $userId,
-            ':limit' => self::PER_PAGE,
-            ':offset' => $shift,
-        ])) {
-
+        $statement->bindValue(':userId', (int) $userId, PDO::PARAM_INT);
+        $statement->bindValue(':limit', (int) PER_PAGE, PDO::PARAM_INT);
+        $statement->bindValue(':offset', (int) $shift, PDO::PARAM_INT);
+        if ($statement->execute()) {
             $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
             $posts = [];
-            foreach($rows as $row) {
+
+            foreach ($rows as $row) {
                 $post = new PostModel(
                     $row['id'],
                     $row['title'], $row['body'],
-                    $row['image'], $row['createdAt'], $row['userId']);
+                    $row['image'],
+                    $row['createdAt'],
+                    $row['userId']
+                );
                 $posts[] = $post;
             }
         }
-
-        $results = [];
-
-
-
-        if(file_exists("db/" . $userId . ".db")) {
-            $posts = fopen("db/" . $userId . ".db", "r");
-
-            for ($i = 0; $i < $shift; $i++) {
-                fgets($posts);
-            }
-
-
-            $counter = 0;
-            while (!feof($posts) && $counter < self::PER_PAGE) {
-                if ($line = fgets($posts)) {
-                    $post = json_decode($line, true);
-                    $post = new PostModel($post['title'], $post['body'], $post['image'], $post['createdAt']);
-                    $results[] = $post;
-                }
-
-                $counter++;
-            }
-
-            fclose($posts);
-        }
-
-        return $results;
+        return $posts;
     }
 
     public function load($post, $files) {
@@ -193,5 +164,62 @@ class PostModel {
         }
 
         return true;
+    }
+
+    public static function getTotalPosts($userId)
+    {
+        $sql = 'SELECT COUNT(*) FROM post WHERE user_id = :userId';
+        $statment =MySQLConnector::getInstance()->getPDO()->prepare($sql);
+        $statment->bindValue(':userId', (int) $userId, PDO::PARAM_INT);
+        if($statment->execute()) {
+            $totalPosts = $statment->fetch();
+            return $totalPosts[0];
+        }
+        else {
+            return false;
+        }
+    }
+
+    public static function getTotalImages($userId)
+    {
+        $sql = 'SELECT COUNT(*) FROM post WHERE user_id = :userId AND image IS NOT NULL';
+        $statment =MySQLConnector::getInstance()->getPDO()->prepare($sql);
+        $statment->bindValue(':userId', (int) $userId, PDO::PARAM_INT);
+        if($statment->execute()) {
+            $totalPosts = $statment->fetch();
+            return $totalPosts;
+        }
+        else {
+            return false;
+        }
+    }
+    public static function addCountInfo($users) {
+        $newUsers = [];
+        foreach ($users as $user) {
+
+            $countPosts = PostModel::getTotalPostCount($user->id);
+            $countImages = PostModel::getTotalImages($user->id);
+            $user->countPosts = $countPosts[0];
+            $user->countImages = $countImages[0];
+            $newUsers[] = $user;
+        }
+        return $newUsers;
+    }
+
+    public function delete()
+    {
+        if ($this->id) {
+            $sql = "DELETE FROM post WHERE id = :id";
+            $statement = MySQLConnector::getInstance()->getPDO()->prepare($sql);
+            if ($statement->execute([
+                ':id' => $this->id,
+            ])
+            ) {
+                $this->id = null;
+                return true;
+            }
+        }
+
+        return false;
     }
 }

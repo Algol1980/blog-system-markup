@@ -2,6 +2,8 @@
 
 session_start();
 
+const PER_PAGE = 5;
+
 spl_autoload_register(function($className){
     if(strpos($className, "Controller")) {
         require_once 'controllers' . DIRECTORY_SEPARATOR . $className . '.php';

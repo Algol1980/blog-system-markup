@@ -23,7 +23,7 @@ require "header.php";
                     </p>
                     <hr />
                     <p class="post-when-by">
-                        <?php echo $post->createdAt; ?>
+                        <?php echo $post->createdAt->format('Y-m-d H:i:s'); ?>
                     </p>
                 </div>
             <?php

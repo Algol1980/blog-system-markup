@@ -4,12 +4,28 @@ class BlogController {
     public function actionIndex($params) {
 
         $id = $params[1];
+        if($params[2]) {
+            $page = (int)$params[2];
+        }
+        else {
+            $page = 1;
+        }
 
-        $posts = PostModel::findPostsByUser($id);
+
+        $posts = PostModel::findPostsByUser($id, $page);
 
         require_once __DIR__ . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR
             . 'blog' . DIRECTORY_SEPARATOR . 'index.php';
+
+        $path = '/blog/index/' . $id . '/';
+        $totalPosts = PostModel::getTotalPosts($id);
+        if($pagination = new Pagination($totalPosts, $page, $path)) {
+
+            require_once __DIR__ . DIRECTORY_SEPARATOR .
+                '..' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR
+                . 'components' . DIRECTORY_SEPARATOR . 'pagination.php';
+        }
     }
 
     public function actionAdd() {

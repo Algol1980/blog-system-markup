@@ -7,7 +7,7 @@ class MySQLConnector {
      */
     private static $instance;
 
-    private $dbName = 'spalah_blog';
+    private $dbName = 'blogdb';
     private $username = 'root';
     private $password = '';
     private $host = 'localhost';

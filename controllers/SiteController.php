@@ -1,25 +1,30 @@
 <?php
 
-class SiteController {
-    public function actionIndex() {
+class SiteController
+{
+    public function actionIndex()
+    {
 
 
-        $user = new UserModel(null, 'mike@gmail.com', 'sadsad', 'dqwdqwdwq', '123', '1991-08-01');
-        $user->save();
+//        $user = new UserModel(null, 'mike@gmail.com', 'sadsad', 'dqwdqwdwq', '123', '1991-08-01');
+//        $user->save();
 
 
-        $users = UserModel::getUsers(5);
+        $users = UserModel::getUsers(5, $counters=true);
+//        $users = PostModel::addCountInfo($users);
+
 
         require_once __DIR__ . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR
             . 'site' . DIRECTORY_SEPARATOR . 'index.php';
     }
 
-    public function actionLogin() {
+    public function actionLogin()
+    {
 
-        if(!empty($_POST)) {
-            if(isset($_POST['email']) && isset($_POST['password'])) {
-                if($user = UserModel::checkUser($_POST['email'], $_POST['password'])) {
+        if (!empty($_POST)) {
+            if (isset($_POST['email']) && isset($_POST['password'])) {
+                if ($user = UserModel::checkUser($_POST['email'], $_POST['password'])) {
                     $_SESSION['user'] = true;
                     $_SESSION['firstName'] = $user->firstName;
                     $_SESSION['lastName'] = $user->lastName;
@@ -35,18 +40,20 @@ class SiteController {
         }
     }
 
-    public function actionLogout() {
+    public function actionLogout()
+    {
         session_start();
         session_destroy();
         Router::redirect('/');
     }
 
-    public function actionRegister() {
+    public function actionRegister()
+    {
         if (!empty($_POST)) {
             $user = new UserModel();
             $user->load($_POST);
-            if($user->validate()) {
-                if($user->save()) {
+            if ($user->validate()) {
+                if ($user->save()) {
                     $_SESSION['user'] = true;
                     $_SESSION['firstName'] = $user->firstName;
                     $_SESSION['lastName'] = $user->lastName;
@@ -61,4 +68,6 @@ class SiteController {
             '..' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR
             . 'site' . DIRECTORY_SEPARATOR . 'register.php';
     }
+
+
 }

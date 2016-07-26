@@ -29,13 +29,13 @@
                 ?>
                 <tr>
                     <td>
-                        <a href="blog.php?user-id=<?php echo $user->id; ?>"><?php echo $user->firstName . ' ' . $user->lastName; ?></a>
+                        <a href="/blog/index/<?php echo $user->id; ?>"><?php echo $user->firstName . ' ' . $user->lastName; ?></a>
                     </td>
                     <td>
-                        0
+                        <?php echo $user->countPosts; ?>
                     </td>
                     <td>
-                        0
+                        <?php echo $user->countImages; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
