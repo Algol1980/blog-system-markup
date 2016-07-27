@@ -222,4 +222,40 @@ class PostModel {
 
         return false;
     }
+
+    public static function search($userId = false, $page = 1, $searchText)
+    {
+        $shift = ($page - 1) * PER_PAGE;
+        if ($userId) {
+            $sql = 'SELECT * FROM post WHERE user_id = :userId
+            AND (title LIKE :searchText OR body LIKE :searchText)
+            LIMIT :limit OFFSET :offset';
+        }
+        else {
+            $sql = 'SELECT * FROM post WHERE title LIKE :searchText OR body LIKE :searchText
+            LIMIT :limit OFFSET :offset';
+        }
+
+        $statement = MySQLConnector::getInstance()->getPDO()->prepare($sql);
+        $statement->bindValue(':userId', (int) $userId, PDO::PARAM_INT);
+        $statement->bindValue(':limit', (int) PER_PAGE, PDO::PARAM_INT);
+        $statement->bindValue(':offset', (int) $shift, PDO::PARAM_INT);
+        $statement->bindValue(':searchText', '%'.$searchText.'%', PDO::PARAM_STR);
+        if ($statement->execute()) {
+            $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $posts = [];
+
+            foreach ($rows as $row) {
+                $post = new PostModel(
+                    $row['id'],
+                    $row['title'], $row['body'],
+                    $row['image'],
+                    $row['createdAt'],
+                    $row['userId']
+                );
+                $posts[] = $post;
+            }
+        }
+        return $posts;
+    }
 }

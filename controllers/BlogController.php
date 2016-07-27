@@ -1,13 +1,14 @@
 <?php
 
-class BlogController {
-    public function actionIndex($params) {
+class BlogController
+{
+    public function actionIndex($params)
+    {
 
         $id = $params[1];
-        if($params[2]) {
+        if (isset($params[2])) {
             $page = (int)$params[2];
-        }
-        else {
+        } else {
             $page = 1;
         }
 
@@ -20,7 +21,7 @@ class BlogController {
 
         $path = '/blog/index/' . $id . '/';
         $totalPosts = PostModel::getTotalPosts($id);
-        if($pagination = new Pagination($totalPosts, $page, $path)) {
+        if ($pagination = new Pagination($totalPosts, $page, $path)) {
 
             require_once __DIR__ . DIRECTORY_SEPARATOR .
                 '..' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR
@@ -28,14 +29,15 @@ class BlogController {
         }
     }
 
-    public function actionAdd() {
+    public function actionAdd()
+    {
 
 
         $post = new PostModel();
         $post->load($_POST, $_FILES);
 
 
-        if($post->validate()) {
+        if ($post->validate()) {
             $post->setUserId($_SESSION['userId']);
             $post->save();
             Router::redirect("/blog/index/" . $_SESSION['userId']);
@@ -45,5 +47,18 @@ class BlogController {
         require_once __DIR__ . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR
             . 'blog' . DIRECTORY_SEPARATOR . 'add.php';
+    }
+
+    public function actionSearch($params)
+    {
+        $id = $params[1];
+        if (isset($params[2])) {
+            $page = (int)$params[2];
+        } else {
+            $page = 1;
+        }
+
+
+
     }
 }

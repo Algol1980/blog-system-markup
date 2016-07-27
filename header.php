@@ -46,7 +46,7 @@
 <!--                <li><a href="photos.php?user-id=--><?php //echo $currentUser['id'] ?><!--">Photos</a></li>-->
                 <?php } ?>
             </ul>
-            <form class="navbar-form navbar-left" role="search" method="GET" action="search.php">
+            <form class="navbar-form navbar-left" role="search" method="GET" action="search/">
                 <div class="form-group">
                     <div class="input-group">
                         <?php if(isset($currentUser)) {

@@ -34,9 +34,13 @@ class Router {
                 'controller' => 'UserController',
                 'action' => 'actionProfile'
             ],
-            '/^\/blog\/index\/(\d+)\/?(\d+)?$/' => [
+            '/^\/blog\/index\/(\d+)\/?(\d+)?\/?$/' => [
                 'controller' => 'BlogController',
                 'action' => 'actionIndex'
+            ],
+            '/^\/blog\/search\/(\d+)\/?(\d+)?\/?(\w+)\/?$/' => [
+                'controller' => 'BlogController',
+                'action' => 'actionSearch'
             ],
             '/^\/blog\/add$/' => [
                 'controller' => 'BlogController',
