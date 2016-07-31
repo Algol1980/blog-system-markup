@@ -24,7 +24,7 @@
             {% if isGuest() %}
                 <a class="navbar-brand" href="/">Blog System</a>
             {% else %}
-                <a class="navbar-brand" href="/blog/index/{{ getUser().id }}">{{ getUser().firstName }} {{ getUser().lastName }}</a>
+                <a class="navbar-brand" href="/">{{ currentUser.getFirstName() }} {{  currentUser.getLastName() }}</a>
             {% endif %}
 
         </div>

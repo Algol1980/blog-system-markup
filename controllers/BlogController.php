@@ -6,6 +6,7 @@ use app\components\Twig;
 use app\models\PostModel;
 use app\components\Router;
 use app\components\Pagination;
+use app\models\UserModel;
 
 class BlogController
 {
@@ -19,6 +20,7 @@ class BlogController
             $page = 1;
         }
 
+        $currentUser = UserModel::getUserById($id);
 
         $posts = PostModel::findPostsByUser($id, $page);
 
@@ -29,7 +31,8 @@ class BlogController
         echo Twig::getInstance()->render('blog/index.twig', [
                                                              'posts' => $posts,
                                                              'path' => $path,
-                                                             'pagination' => $pagination
+                                                             'pagination' => $pagination,
+                                                             'currentUser' => $currentUser
                                                             ]);
     }
 
