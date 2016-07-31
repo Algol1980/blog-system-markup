@@ -1,5 +1,12 @@
 <?php
 
+namespace app\controllers;
+
+use app\components\Twig;
+use app\models\PostModel;
+use app\components\Router;
+use app\components\Pagination;
+
 class BlogController
 {
     public function actionIndex($params)
@@ -15,18 +22,15 @@ class BlogController
 
         $posts = PostModel::findPostsByUser($id, $page);
 
-        require_once __DIR__ . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR
-            . 'blog' . DIRECTORY_SEPARATOR . 'index.php';
-
         $path = '/blog/index/' . $id . '/';
         $totalPosts = PostModel::getTotalPosts($id);
-        if ($pagination = new Pagination($totalPosts, $page, $path)) {
+        $pagination = new Pagination($totalPosts, $page, $path);
 
-            require_once __DIR__ . DIRECTORY_SEPARATOR .
-                '..' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR
-                . 'components' . DIRECTORY_SEPARATOR . 'pagination.php';
-        }
+        echo Twig::getInstance()->render('blog/index.twig', [
+                                                             'posts' => $posts,
+                                                             'path' => $path,
+                                                             'pagination' => $pagination
+                                                            ]);
     }
 
     public function actionAdd()
@@ -43,10 +47,7 @@ class BlogController
             Router::redirect("/blog/index/" . $_SESSION['userId']);
         }
 
-
-        require_once __DIR__ . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR
-            . 'blog' . DIRECTORY_SEPARATOR . 'add.php';
+        echo Twig::getInstance()->render('blog/add.twig');
     }
 
     public function actionSearch($params)

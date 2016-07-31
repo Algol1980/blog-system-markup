@@ -1,5 +1,10 @@
 <?php
 
+namespace app\models;
+
+use app\components\MySQLConnector;
+use app;
+
 /**
  * Class PostModel
  *
@@ -24,9 +29,9 @@ class PostModel {
         $this->image = $image;
 //        $this->createdAt = $createdAt;
         if(is_string($createdAt)) {
-            $createdAt = new DateTime($createdAt);
+            $createdAt = new \DateTime($createdAt);
         }
-        if($createdAt instanceof DateTime) {
+        if($createdAt instanceof \DateTime) {
             $this->createdAt = $createdAt;
         }
         $this->userId = $userId;
@@ -42,7 +47,7 @@ class PostModel {
             $sql = 'UPDATE post SET title = :title, body = :body, image = :image, createdAt = :createdAt, user_id = :user_id,';
         } else {
             $sql = 'INSERT INTO post (title, body, image, createdAt, user_id) VALUES (:title, :body, :image, :createdAt, :user_id)';
-            $this->createdAt = new DateTime();
+            $this->createdAt = new \DateTime();
         }
         $name = false;
 
@@ -109,14 +114,14 @@ class PostModel {
     public static function findPostsByUser($userId, $page = 1)
     {
 
-        $shift = ($page - 1) * PER_PAGE;
+        $shift = ($page - 1) * app\PER_PAGE;
         $sql = 'SELECT * FROM post WHERE user_id = :userId LIMIT :limit OFFSET :offset';
         $statement = MySQLConnector::getInstance()->getPDO()->prepare($sql);
-        $statement->bindValue(':userId', (int) $userId, PDO::PARAM_INT);
-        $statement->bindValue(':limit', (int) PER_PAGE, PDO::PARAM_INT);
-        $statement->bindValue(':offset', (int) $shift, PDO::PARAM_INT);
+        $statement->bindValue(':userId', (int) $userId, \PDO::PARAM_INT);
+        $statement->bindValue(':limit', (int) app\PER_PAGE, \PDO::PARAM_INT);
+        $statement->bindValue(':offset', (int) $shift, \PDO::PARAM_INT);
         if ($statement->execute()) {
-            $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
             $posts = [];
 
             foreach ($rows as $row) {
@@ -170,7 +175,7 @@ class PostModel {
     {
         $sql = 'SELECT COUNT(*) FROM post WHERE user_id = :userId';
         $statment =MySQLConnector::getInstance()->getPDO()->prepare($sql);
-        $statment->bindValue(':userId', (int) $userId, PDO::PARAM_INT);
+        $statment->bindValue(':userId', (int) $userId, \PDO::PARAM_INT);
         if($statment->execute()) {
             $totalPosts = $statment->fetch();
             return $totalPosts[0];
@@ -184,7 +189,7 @@ class PostModel {
     {
         $sql = 'SELECT COUNT(*) FROM post WHERE user_id = :userId AND image IS NOT NULL';
         $statment =MySQLConnector::getInstance()->getPDO()->prepare($sql);
-        $statment->bindValue(':userId', (int) $userId, PDO::PARAM_INT);
+        $statment->bindValue(':userId', (int) $userId, \PDO::PARAM_INT);
         if($statment->execute()) {
             $totalPosts = $statment->fetch();
             return $totalPosts;
@@ -225,7 +230,7 @@ class PostModel {
 
     public static function search($userId = false, $page = 1, $searchText)
     {
-        $shift = ($page - 1) * PER_PAGE;
+        $shift = ($page - 1) * app\PER_PAGE;
         if ($userId) {
             $sql = 'SELECT * FROM post WHERE user_id = :userId
             AND (title LIKE :searchText OR body LIKE :searchText)
@@ -237,12 +242,12 @@ class PostModel {
         }
 
         $statement = MySQLConnector::getInstance()->getPDO()->prepare($sql);
-        $statement->bindValue(':userId', (int) $userId, PDO::PARAM_INT);
-        $statement->bindValue(':limit', (int) PER_PAGE, PDO::PARAM_INT);
-        $statement->bindValue(':offset', (int) $shift, PDO::PARAM_INT);
-        $statement->bindValue(':searchText', '%'.$searchText.'%', PDO::PARAM_STR);
+        $statement->bindValue(':userId', (int) $userId, \PDO::PARAM_INT);
+        $statement->bindValue(':limit', (int) app\PER_PAGE, \PDO::PARAM_INT);
+        $statement->bindValue(':offset', (int) $shift, \PDO::PARAM_INT);
+        $statement->bindValue(':searchText', '%'.$searchText.'%', \PDO::PARAM_STR);
         if ($statement->execute()) {
-            $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
             $posts = [];
 
             foreach ($rows as $row) {
@@ -258,4 +263,53 @@ class PostModel {
         }
         return $posts;
     }
+
+    /**
+     * @return null
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return null
+     */
+    public function getUserId()
+    {
+        return $this->userId;
+    }
+
+    /**
+     * @return null
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @return null
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
+
+    /**
+     * @return null
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
 }

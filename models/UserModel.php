@@ -1,5 +1,10 @@
 <?php
 
+namespace app\models;
+
+use app\components\MySQLConnector;
+
+
 /**
  * Class UserModel
  * @property int $id
@@ -28,9 +33,9 @@ class UserModel
         $this->lastName = $lastName;
         $this->password = $password;
         if (is_string($createdAt)) {
-            $createdAt = new DateTime($createdAt);
+            $createdAt = new \DateTime($createdAt);
         }
-        if ($createdAt instanceof DateTime) {
+        if ($createdAt instanceof \DateTime) {
             $this->createdAt = $createdAt;
         }
     }
@@ -41,7 +46,7 @@ class UserModel
             $sql = 'UPDATE user SET email = :e, firstName = :fN, lastName = :lN, password = :pwd, createdAt = :createdAt';
         } else {
             $sql = 'INSERT INTO user (email, firstName, lastName, password, createdAt) VALUES (:e, :fN, :lN, :pwd, :createdAt)';
-            $this->createdAt = new DateTime();
+            $this->createdAt = new \DateTime();
         }
 
         $statement = MySQLConnector::getInstance()->getPDO()->prepare($sql);
@@ -129,7 +134,7 @@ class UserModel
         $statement->execute([
             ':id' => $id,
         ]);
-        if ($user = $statement->fetch(PDO::FETCH_ASSOC)) {
+        if ($user = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $user = new UserModel($user['id'], $user['email'], $user['firstName'], $user['lastName'], $user['password'], $user['createdAt']);
             return $user;
         }
@@ -153,10 +158,10 @@ class UserModel
             $sql = 'SELECT * FROM user LIMIT :limit';
         }
         $statement = MySQLConnector::getInstance()->getPDO()->prepare($sql);
-        $statement->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
+        $statement->bindValue(':limit', (int) $limit, \PDO::PARAM_INT);
         if ($statement->execute()) {
             $users = [];
-            $user = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $user = $statement->fetchAll(\PDO::FETCH_ASSOC);
             foreach ($user as $item) {
                     $newItem = new UserModel($item['id'],
                         $item['email'],
@@ -191,12 +196,52 @@ class UserModel
             ':email' => $email,
             ':pwd' => $password,
         ]);
-        if ($user = $statement->fetch(PDO::FETCH_ASSOC)) {
+        if ($user = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $user = new UserModel($user['id'], $user['email'], $user['firstName'], $user['lastName'], $user['password'], $user['createdAt']);
             return $user;
         }
 
         return null;
+    }
+
+    /**
+     * @return null
+     */
+    public function getFirstName()
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return null
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @return null
+     */
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
     }
 
 }

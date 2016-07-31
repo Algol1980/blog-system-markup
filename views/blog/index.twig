@@ -1,0 +1,24 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+    <div class="container">
+        {% for post in posts %}
+            <div class="post">
+                <h1 class="post-header">{{ post.getTitle() }}</h1>
+                {% if post.getImage() is not empty %}
+                    <img src="/img/{{ post.getImage() }}"/>
+                {% endif %}
+                <hr/>
+                <p class="post-content">
+                    {{ post.getBody() }}
+                </p>
+                <hr/>
+                <p class="post-when-by">
+                    {{ post.getCreatedAt()|date('Y-m-d H:i:s') }}
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+
+   {% include 'components/pagination.twig' %}
+{% endblock %}

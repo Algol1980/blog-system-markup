@@ -1,27 +1,6 @@
-<?php
-    require "functions.php";
+{% extends 'layout.twig' %}
 
-    if(!empty($_POST)) {
-        if(isset($_POST['email']) && isset($_POST['password'])) {
-            $user = checkUser(
-                $_POST['email'], $_POST['password']
-            );
-            if($user) {
-                $_SESSION['user'] = true;
-                $_SESSION['firstName'] = $user['firstName'];
-                $_SESSION['lastName'] = $user['lastName'];
-                $_SESSION['userId'] = $user['id'];
-                header("Location: index.php");
-            }
-        }
-    }
-
-
-    require "header.php";
-
-
-?>
-
+{% block content %}
 <div class="container">
 
     <div class="col-lg-6 col-lg-offset-3">
@@ -48,7 +27,4 @@
     </div>
 
 </div>
-
-<?php
-    require "footer.php";
-?>
+{% endblock %}

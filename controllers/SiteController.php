@@ -1,22 +1,25 @@
 <?php
 
+namespace app\controllers;
+
+use app\models\UserModel;
+use app\components\Router;
+use app\components\Twig;
+
 class SiteController
+
 {
     public function actionIndex()
     {
 
 
-//        $user = new UserModel(null, 'mike@gmail.com', 'sadsad', 'dqwdqwdwq', '123', '1991-08-01');
-//        $user->save();
-
-
         $users = UserModel::getUsers(5, $counters=true);
-//        $users = PostModel::addCountInfo($users);
 
+        echo Twig::getInstance()->render('site/index.twig', [
+            'isGuest' => !isset($_SESSION['user']),
+            'users' => $users
+        ]);
 
-        require_once __DIR__ . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR
-            . 'site' . DIRECTORY_SEPARATOR . 'index.php';
     }
 
     public function actionLogin()
@@ -33,10 +36,7 @@ class SiteController
                 }
             }
         } else {
-
-            require_once __DIR__ . DIRECTORY_SEPARATOR .
-                '..' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR
-                . 'site' . DIRECTORY_SEPARATOR . 'login.php';
+            echo Twig::getInstance()->render('site/login.twig');
         }
     }
 
@@ -64,9 +64,7 @@ class SiteController
         }
 
 
-        require_once __DIR__ . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR
-            . 'site' . DIRECTORY_SEPARATOR . 'register.php';
+        echo Twig::getInstance()->render('site/register.twig');
     }
 
 

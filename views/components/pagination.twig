@@ -1,0 +1,19 @@
+<nav>
+    {#{% if pagination.buttons is not empty %}#}
+    <ul class="pagination">
+        {% for value in pagination.buttons %}
+            {% if value.isActive == true %}
+                <li>
+                    <a href="{{ pagination.path }}{{ value.page }}">
+                        <span aria-hidden="true">{{ value.text }}</span>
+                    </a>
+                </li>
+           {% else %}
+                <li class="disabled">
+                    <span aria-hidden="true">{{ value.text }}</span>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    {#{% endif %}#}
+</nav>

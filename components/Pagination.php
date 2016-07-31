@@ -1,4 +1,6 @@
 <?php
+namespace app\components;
+use app;
 
 /**
  * Created by PhpStorm.
@@ -21,7 +23,7 @@ class Pagination
         }
         $this->totalPosts = $totalPosts;
         $this->currentPage = $currentPage;
-        $this->totalPages = ceil($this->totalPosts/ PER_PAGE);
+        $this->totalPages = ceil($this->totalPosts / app\PER_PAGE);
         $this->path = $path;
 
         if ( $this->totalPages == 1) {

@@ -1,4 +1,5 @@
 <?php
+namespace app\components;
 
 class Router {
     private static $instance;
@@ -19,31 +20,35 @@ class Router {
     private function routes() {
         return [
             '/^\/$/' => [
-                'controller' => 'SiteController',
+                'controller' => 'app\controllers\SiteController',
                 'action' => 'actionIndex'
             ],
             '/^\/site\/register$/' => [
-                'controller' => 'SiteController',
+                'controller' => 'app\controllers\SiteController',
                 'action' => 'actionRegister'
             ],
             '/^\/site\/login$/' => [
-                'controller' => 'SiteController',
+                'controller' => 'app\controllers\SiteController',
                 'action' => 'actionLogin'
             ],
+            '/^\/site\/logout$/' => [
+                'controller' => 'app\controllers\SiteController',
+                'action' => 'actionLogout'
+            ],
             '/^\/user\/profile\/(\d+)$/' => [
-                'controller' => 'UserController',
+                'controller' => 'app\controllers\UserController',
                 'action' => 'actionProfile'
             ],
             '/^\/blog\/index\/(\d+)\/?(\d+)?\/?$/' => [
-                'controller' => 'BlogController',
+                'controller' => 'app\controllers\BlogController',
                 'action' => 'actionIndex'
             ],
             '/^\/blog\/search\/(\d+)\/?(\d+)?\/?(\w+)\/?$/' => [
-                'controller' => 'BlogController',
+                'controller' => 'app\controllers\BlogController',
                 'action' => 'actionSearch'
             ],
             '/^\/blog\/add$/' => [
-                'controller' => 'BlogController',
+                'controller' => 'app\controllers\BlogController',
                 'action' => 'actionAdd',
                 'auth' => true,
             ],

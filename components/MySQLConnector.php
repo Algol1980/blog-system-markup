@@ -1,4 +1,5 @@
 <?php
+namespace app\components;
 
 class MySQLConnector {
 
@@ -28,7 +29,7 @@ class MySQLConnector {
 
     private function __construct() {
         try {
-            $this->dbh = new PDO("mysql:host=".$this->host.";dbname=".$this->dbName, $this->username, $this->password);
+            $this->dbh = new \PDO("mysql:host=".$this->host.";dbname=".$this->dbName, $this->username, $this->password);
         } catch (Exception $error) {
             throw new Exception("Can not connect to db");
         }

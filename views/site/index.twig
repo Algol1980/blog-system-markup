@@ -1,16 +1,18 @@
-<?php
-    require "header.php";
-?>
+{% extends "layout.twig" %}
 
+
+{% block content %}
     <div class="container">
 
-        <?php if(!isset($_SESSION['user'])): ?>
+
+        {% if isGuest() %}
             <div class="jumbotron">
                 <h1>Introduce cool blog system!</h1>
                 <p>It's very cool and fun, try it!</p>
                 <p><a class="btn btn-primary" href="/site/register">Start using!</a> or <a href="/site/login" class="btn btn-primary">Log in</a></p>
             </div>
-        <?php endif; ?>
+        {% endif %}
+
 
         <h2>List of bloggers</h2>
         <table class="table table-bordered table-striped">
@@ -23,26 +25,23 @@
             </thead>
             <tbody>
 
-            <?php
-            /* @var $users UserModel[] */
-            foreach($users as $user):
-                ?>
+            {% for user in users %}
                 <tr>
                     <td>
-                        <a href="/blog/index/<?php echo $user->id; ?>"><?php echo $user->firstName . ' ' . $user->lastName; ?></a>
+                        <a href="blog/index/{{ user.getId() }}">{{ user.getFirstName() }} {{ user.getLastName() }}</a>
                     </td>
                     <td>
-                        <?php echo $user->countPosts; ?>
+                        {{ user.countPosts }}
                     </td>
                     <td>
-                        <?php echo $user->countImages; ?>
+                        {{ user.countImages }}
                     </td>
                 </tr>
-            <?php endforeach; ?>
+            {% endfor %}
+
             </tbody>
         </table>
 
     </div>
-<?php
-require "footer.php";
-?>
+
+{% endblock %}
