@@ -29,11 +29,11 @@ class BlogController
         $pagination = new Pagination($totalPosts, $page, $path);
 
         echo Twig::getInstance()->render('blog/index.twig', [
-                                                             'posts' => $posts,
-                                                             'path' => $path,
-                                                             'pagination' => $pagination,
-                                                             'currentUser' => $currentUser
-                                                            ]);
+            'posts' => $posts,
+            'path' => $path,
+            'pagination' => $pagination,
+            'currentUser' => $currentUser
+        ]);
     }
 
     public function actionAdd()
@@ -55,7 +55,7 @@ class BlogController
 
     public function actionSearch($params)
     {
-        $id = $params[1];
+        $searchText = $params[1];
         if (isset($params[2])) {
             $page = (int)$params[2];
         } else {
@@ -63,6 +63,17 @@ class BlogController
         }
 
 
+        $posts = PostModel::search($page, $searchText);
 
+        $path = '/blog/search/' . $searchText . '/';
+        $totalPosts = PostModel::getTotalPostsSearch($searchText);
+        $pagination = new Pagination($totalPosts, $page, $path);
+
+        echo Twig::getInstance()->render('blog/index.twig', [
+            'posts' => $posts,
+            'path' => $path,
+            'pagination' => $pagination
+//            'currentUser' => $currentUser
+        ]);
     }
 }

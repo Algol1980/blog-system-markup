@@ -43,7 +43,7 @@ class Router {
                 'controller' => 'app\controllers\BlogController',
                 'action' => 'actionIndex'
             ],
-            '/^\/blog\/search\/(\d+)\/?(\d+)?\/?(\w+)\/?$/' => [
+            '/^\/blog\/search\/(.+)\/?(\d+)?\/?$/' => [
                 'controller' => 'app\controllers\BlogController',
                 'action' => 'actionSearch'
             ],
@@ -60,6 +60,15 @@ class Router {
     }
 
     public function handle($route) {
+
+        if(isset($_GET['search'])) {
+            if(empty($_GET['search'])) {
+                self::redirect('/');
+            }
+            $route = '/blog/search/' . $_GET['search'];
+            self::redirect($route);
+        }
+
         $routes = $this->routes();
         foreach(array_keys($routes) as $r) {
             $matches = [];
